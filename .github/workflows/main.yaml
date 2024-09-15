@@ -1,8 +1,6 @@
 name: py
 
-on:
-  schedule:
-    - cron: "30 11 * * *"    #
+on: workflow_dispatch
 
 jobs:
   build:
@@ -20,7 +18,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
+
       - name: execute python script # run file
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
