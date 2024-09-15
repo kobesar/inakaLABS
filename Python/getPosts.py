@@ -12,9 +12,8 @@ from google.generativeai.types import HarmCategory, HarmBlockThreshold
 keywords_df = pd.read_csv('https://raw.githubusercontent.com/kobesar/inakaLABS/main/Data/Keywords.csv')
 
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
-cx = os.getenv('SEARCH_TOOL_ID')
-
 GEMINI_API_KEY=os.getenv('GEMINI_API_KEY')
+SEARCH_TOOL_ID = os.getenv('SEARCH_TOOL_ID')
 
 base_url = 'https://www.googleapis.com/customsearch/v1?key=%s' % GOOGLE_API_KEY
 genai.configure(api_key=GEMINI_API_KEY)
@@ -55,7 +54,7 @@ def get_sites(category, term, dateRestrict='d7'):
   orTerms = category
 
   # Combine the base_url with the custom query
-  url = base_url + '&cx=%s&exactTerms=%s&orTerms=%s&dateRestrict=%s' % (cx, exactTerms, orTerms, dateRestrict)
+  url = base_url + '&cx=%s&exactTerms=%s&orTerms=%s&dateRestrict=%s' % (SEARCH_TOOL_ID, exactTerms, orTerms, dateRestrict)
   
   result = []
 
@@ -92,4 +91,4 @@ for index, row in keywords_df.sample(25).iterrows():
 
   time.sleep(1)
 
-pd.DataFrame(full_result).to_csv('../data/query_results_' + time.strftime('%Y%m%d', time.localtime()) + '.csv', index=False)
+pd.DataFrame(full_result).to_csv('Runs/data/query_results_' + time.strftime('%Y%m%d', time.localtime()) + '.csv', index=False)

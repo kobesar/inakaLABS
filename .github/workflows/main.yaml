@@ -1,4 +1,4 @@
-name: py
+name: Generate Posts
 
 on: workflow_dispatch
 
@@ -25,4 +25,4 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SEARCH_TOOL_ID: ${{ secrets.SEARCH_TOOL_ID }}
         run: |
-          python Python/test.py
+          python Python/getPosts.py
