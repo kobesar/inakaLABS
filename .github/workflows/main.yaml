@@ -25,4 +25,4 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SEARCH_TOOL_ID: ${{ secrets.SEARCH_TOOL_ID }}
         run: |
-          python test.py
+          python Python/test.py
