@@ -1,9 +1,8 @@
 name: Generate Posts
 
-on: 
-  # workflow_dispatch
-  cron:
-    - cron: '0 0 * * 0' # run once a week
+on: workflow_dispatch
+  # schedule:
+    # - cron: '0 0 * * 0' # run once a week
 
 jobs:
   build:
