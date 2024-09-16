@@ -4,6 +4,9 @@ on: workflow_dispatch
   # schedule:
     # - cron: '0 0 * * 0' # run once a week
 
+permissions:
+      contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,3 +31,8 @@ jobs:
           SEARCH_TOOL_ID: ${{ secrets.SEARCH_TOOL_ID }}
         run: |
           python Python/getPosts.py
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "crongenerated"
+          git push
