@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Import the Google's generative AI library
 import google.generativeai as genai
-from google.generativeai.types import HarmCategory, HarmBlockThreshold
+from google.generativeai.types import HarmCategory, HarmBlockThreshold, GenerationConfig
 
 # Load the keywords
 keywords_df = pd.read_csv('https://raw.githubusercontent.com/kobesar/inakaLABS/main/Data/Keywords.csv')
@@ -54,16 +54,27 @@ Keep it super short.
 model_general = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_instruction)
 model_x = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_instruction_x)
 
+# Generation configs
+config = GenerationConfig(
+    max_output_tokens=2048, temperature=0.4, top_p=1, top_k=32
+)
+config_x = GenerationConfig(
+    max_output_tokens=60, temperature=0.4, top_p=1, top_k=32
+)
+
 # Function to generate post, given some text
-def generate_post(title, snippet, model):
+def generate_post(title, snippet, model, config):
     response = model.generate_content(
       'Title: %s \n Snippet: %s' % (title, snippet),
-        safety_settings={
+      safety_settings={
         HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-    })
+        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH
+        },
+      generation_config=config
+
+)
 
     time.sleep(4.5)
 
@@ -91,8 +102,8 @@ def get_sites(category, term, dateRestrict='d7'):
 
   if 'items' in json.keys():
     for item in json['items']:
-      post_general = generate_post(item['title'], item['snippet'], model_general)
-      post_x = generate_post(item['title'], item['snippet'], model_x)
+      post_general = generate_post(item['title'], item['snippet'], model_general, config)
+      post_x = generate_post(item['title'], item['snippet'], model_x, config_x)
 
       result.append({
         'category': category,
