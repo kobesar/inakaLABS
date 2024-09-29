@@ -2,46 +2,72 @@ import os
 import requests as re
 import pandas as pd
 import time
-import random
-
 from datetime import datetime
 
+# Import the Google's generative AI library
 import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
+# Load the keywords
 keywords_df = pd.read_csv('https://raw.githubusercontent.com/kobesar/inakaLABS/main/Data/Keywords.csv')
 
+# Load the environment variables
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 GEMINI_API_KEY=os.getenv('GEMINI_API_KEY')
-SEARCH_TOOL_ID = os.getenv('SEARCH_TOOL_ID')
+cx = os.getenv('SEARCH_TOOL_ID')
 
+# Ccnfigure base URL for Search API
 base_url = 'https://www.googleapis.com/customsearch/v1?key=%s' % GOOGLE_API_KEY
+
+# Set API key for Gemini
 genai.configure(api_key=GEMINI_API_KEY)
 
+# System instruction for general model
 system_instruction = """
 You are a content creator for Inaka LABS, a groundbreaking initiative brought to you by the Future Economic Rural Network (FERN), aimed at unleashing the untapped potential of rural Japan through the development of rural startup hubs. We believe in a future where rural areas flourish with technology, innovation, and entrepreneurial spirit, contributing significantly to Japan’s economic diversity and sustainability.
 
-Your job is to create a post given an article, follow the given formula to create a post:
+Your job is to create an opioniated post given the title and snippet of an article, follow the given formula to create a post:
 
 1. Article summary
 2. Hot take: this is how our approach is different/more interesting/better
 3. Call to action
 
-Combine the summary, hot take and call to action in a single continuous paragraph. Add relevant hashtags along with a #inakaLABS at the end. All under 280 characters.
+Combine the summary, hot take and call to action in a single continuous paragraph. Add relevant hashtags along with a #inakaLABS at the end, in a regular text format. Cater the post to an audience on Linkedin, Facebook, and Instagram.
 """
 
-model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_instruction)
+# System instruction for model to generate X specific posts
+system_instruction_x = """
+You are a content creator for Inaka LABS, a groundbreaking initiative brought to you by the Future Economic Rural Network (FERN), aimed at unleashing the untapped potential of rural Japan through the development of rural startup hubs. We believe in a future where rural areas flourish with technology, innovation, and entrepreneurial spirit, contributing significantly to Japan’s economic diversity and sustainability.
+
+Your job is to create a short opioniated post on X (under 280 chracters) given the title and snippet of an article, follow the given formula to create a post:
+
+1. Article summary
+2. Hot take: this is how our approach is different/more interesting/better
+3. Call to action
+
+Combine the summary, hot take and call to action in a single continuous paragraph. Add relevant hashtags along with a #inakaLABS at the end, in a regular text format.
+
+Keep it super short.
+"""
+
+# Initialize the models
+model_general = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_instruction)
+model_x = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_instruction_x)
 
 # Function to generate post, given some text
-def generate_post(text):
+def generate_post(title, snippet, model):
     response = model.generate_content(
-    text,
+      'Title: %s \n Snippet: %s' % (title, snippet),
         safety_settings={
         HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
     })
+
+    time.sleep(4.5)
+
+    # print('Post Generated.')
     
     return response
 
@@ -54,16 +80,19 @@ def get_sites(category, term, dateRestrict='d7'):
   orTerms = category
 
   # Combine the base_url with the custom query
-  url = base_url + '&cx=%s&exactTerms=%s&orTerms=%s&dateRestrict=%s' % (SEARCH_TOOL_ID, exactTerms, orTerms, dateRestrict)
+  url = base_url + '&cx=%s&exactTerms=%s&orTerms=%s&dateRestrict=%s' % (cx, exactTerms, orTerms, dateRestrict)
   
   result = []
 
   response = re.get(url)
   json = response.json()
 
+  # print(json)
+
   if 'items' in json.keys():
     for item in json['items']:
-      post = generate_post(item['snippet'])
+      post_general = generate_post(item['title'], item['snippet'], model_general)
+      post_x = generate_post(item['title'], item['snippet'], model_x)
 
       result.append({
         'category': category,
@@ -72,9 +101,10 @@ def get_sites(category, term, dateRestrict='d7'):
         'link': item['link'],
         'formattedUrl': item['formattedUrl'],
         'snippet': item['snippet'],
-        'publishedDate': item['pagemap']['metatags'][0]['article:published_time'] if 'pagemap' in item.keys() and 'article:published_time' in item['pagemap']['metatags'][0] else None,
+        'publishedDate': item['pagemap']['metatags'][0]['article:published_time'] if 'pagemap' in item.keys() and 'metatags' in item['pagemap'].keys() and 'article:published_time' in item['pagemap']['metatags'][0] else None,
         'scrapeDate': time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
-        'post': post.text
+        'post_general': post_general.text,
+        'post_x': post_x.text
       })
       
     return result
@@ -88,7 +118,5 @@ for index, row in keywords_df.sample(25).iterrows():
   term = row['Keyword Clean']
   
   full_result += get_sites(category, term)
-
-  time.sleep(1)
 
 pd.DataFrame(full_result).to_csv('data/Runs/query_results_' + time.strftime('%Y%m%d', time.localtime()) + '.csv', index=False)
