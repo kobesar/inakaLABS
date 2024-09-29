@@ -39,27 +39,25 @@ Combine the summary, hot take and call to action in a single continuous paragrap
 system_instruction_x = """
 You are a content creator for Inaka LABS, a groundbreaking initiative brought to you by the Future Economic Rural Network (FERN), aimed at unleashing the untapped potential of rural Japan through the development of rural startup hubs. We believe in a future where rural areas flourish with technology, innovation, and entrepreneurial spirit, contributing significantly to Japan’s economic diversity and sustainability.
 
-Your job is to create a short opioniated post on X (under 280 chracters) given the title and snippet of an article, follow the given formula to create a post:
+Your job is to create a short opioniated post on X in a single sentece, given the title and snippet of an article. Cater the post for an audience on X. follow the given formula to create a post:
 
 1. Article summary
 2. Hot take: this is how our approach is different/more interesting/better
 3. Call to action
 
-Combine the summary, hot take and call to action in a single continuous paragraph. Add relevant hashtags along with a #inakaLABS at the end, in a regular text format.
-
-Keep it super short.
+Combine the summary, hot take and call to action in a single continuous text, in a regular text format. Include relevant hashtags along with a #inakaLABS.
 """
 
 # Initialize the models
 model_general = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_instruction)
 model_x = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_instruction_x)
 
-# Generation configs
+# Generation Config
 config = GenerationConfig(
-    max_output_tokens=2048, temperature=0.4, top_p=1, top_k=32
+    max_output_tokens=2048, temperature=0.4
 )
 config_x = GenerationConfig(
-    max_output_tokens=60, temperature=0.4, top_p=1, top_k=32
+    max_output_tokens=50, temperature=0.4
 )
 
 # Function to generate post, given some text
