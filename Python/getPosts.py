@@ -56,6 +56,49 @@ config_x = GenerationConfig(
     max_output_tokens=60, temperature=0.4, top_k=50
 )
 
+def remove_markdown(text):
+    """
+    This function removes markdown formatting from the input text.
+
+    Parameters:
+    text (str): The text with markdown formatting.
+
+    Returns:
+    str: The text with markdown removed.
+    """
+    # Remove headers (e.g., ## Header, # Header)
+    text = re.sub(r'^#{1,6}\s*', '', text, flags=re.MULTILINE)
+    
+    # Remove emphasis (bold, italics, etc.)
+    text = re.sub(r'(\*{1,2}|_{1,2})(.*?)\1', r'\2', text)
+    
+    # Remove links and images
+    text = re.sub(r'!\[.*?\]\(.*?\)', '', text)  # Removes images
+    text = re.sub(r'\[.*?\]\(.*?\)', '', text)   # Removes links
+    
+    # Remove inline code and code blocks
+    text = re.sub(r'(`{1,3})(.*?)\1', r'\2', text)
+    
+    # Remove blockquotes
+    text = re.sub(r'^\>\s*', '', text, flags=re.MULTILINE)
+    
+    # Remove strikethrough
+    text = re.sub(r'~~(.*?)~~', r'\1', text)
+    
+    # Remove unordered list bullets (*, +, -)
+    text = re.sub(r'^(\*|\+|\-)\s+', '', text, flags=re.MULTILINE)
+    
+    # Remove ordered list numbers (e.g., 1., 2., 3.)
+    text = re.sub(r'^\d+\.\s+', '', text, flags=re.MULTILINE)
+    
+    # Remove horizontal rules (---, ***)
+    text = re.sub(r'^(-{3,}|_{3,}|\*{3,})$', '', text, flags=re.MULTILINE)
+    
+    # Remove extra spaces
+    text = re.sub(r'\n{2,}', '\n', text)  # Normalize multiple newlines to one
+    
+    return text.strip()
+
 # Function to generate post, given some text
 def generate_post(title, snippet, model, config):
     response = model.generate_content(
@@ -107,8 +150,8 @@ def get_sites(category, term, dateRestrict='d7'):
         'snippet': item['snippet'],
         'publishedDate': item['pagemap']['metatags'][0]['article:published_time'] if 'pagemap' in item.keys() and 'metatags' in item['pagemap'].keys() and 'article:published_time' in item['pagemap']['metatags'][0] else None,
         'scrapeDate': time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
-        'post_general': post_general.text,
-        'post_x': post_x.text
+        'post_general': remove_markdown(post_general.text),
+        'post_x': remove_markdown(post_x.text)
       })
       
     return result
