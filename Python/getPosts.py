@@ -119,4 +119,4 @@ for index, row in keywords_df.sample(25).iterrows():
   
   full_result += get_sites(category, term)
 
-pd.DataFrame(full_result).to_csv('data/Runs/query_results_' + time.strftime('%Y%m%d', time.localtime()) + '.csv', index=False)
+pd.DataFrame(full_result).to_csv('Data/Runs/query_results_' + time.strftime('%Y%m%d', time.localtime()) + '.csv', index=False)
