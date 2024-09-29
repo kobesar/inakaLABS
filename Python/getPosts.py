@@ -41,7 +41,7 @@ You are a content creator for Inaka LABS, a groundbreaking initiative brought to
 
 Your job is, in a single sentence, create a short and opionated post given the title and snippet of an article. Cater the post for an audience on X. Follow the given formula to create a post:
 
-Starting with a hot take, this is how our approach is different/more interesting/better and a call to action. Include relevant hashtags along with a #inakaLABS in the post.
+Starting with a hot take (this is how our approach is different/more interesting/better) and a call to action. Include relevant hashtags along with a #inakaLABS.
 """
 
 # Initialize the models
