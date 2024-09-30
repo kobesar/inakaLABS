@@ -1,4 +1,5 @@
 import os
+import re as reg
 import requests as re
 import pandas as pd
 import time
@@ -67,35 +68,35 @@ def remove_markdown(text):
     str: The text with markdown removed.
     """
     # Remove headers (e.g., ## Header, # Header)
-    text = re.sub(r'^#{1,6}\s*', '', text, flags=re.MULTILINE)
+    text = reg.sub(r'^#{1,6}\s*', '', text, flags=re.MULTILINE)
     
     # Remove emphasis (bold, italics, etc.)
-    text = re.sub(r'(\*{1,2}|_{1,2})(.*?)\1', r'\2', text)
+    text = reg.sub(r'(\*{1,2}|_{1,2})(.*?)\1', r'\2', text)
     
     # Remove links and images
-    text = re.sub(r'!\[.*?\]\(.*?\)', '', text)  # Removes images
-    text = re.sub(r'\[.*?\]\(.*?\)', '', text)   # Removes links
+    text = reg.sub(r'!\[.*?\]\(.*?\)', '', text)  # Removes images
+    text = reg.sub(r'\[.*?\]\(.*?\)', '', text)   # Removes links
     
     # Remove inline code and code blocks
-    text = re.sub(r'(`{1,3})(.*?)\1', r'\2', text)
+    text = reg.sub(r'(`{1,3})(.*?)\1', r'\2', text)
     
     # Remove blockquotes
-    text = re.sub(r'^\>\s*', '', text, flags=re.MULTILINE)
+    text = reg.sub(r'^\>\s*', '', text, flags=re.MULTILINE)
     
     # Remove strikethrough
-    text = re.sub(r'~~(.*?)~~', r'\1', text)
+    text = reg.sub(r'~~(.*?)~~', r'\1', text)
     
     # Remove unordered list bullets (*, +, -)
-    text = re.sub(r'^(\*|\+|\-)\s+', '', text, flags=re.MULTILINE)
+    text = reg.sub(r'^(\*|\+|\-)\s+', '', text, flags=re.MULTILINE)
     
     # Remove ordered list numbers (e.g., 1., 2., 3.)
-    text = re.sub(r'^\d+\.\s+', '', text, flags=re.MULTILINE)
+    text = reg.sub(r'^\d+\.\s+', '', text, flags=re.MULTILINE)
     
     # Remove horizontal rules (---, ***)
-    text = re.sub(r'^(-{3,}|_{3,}|\*{3,})$', '', text, flags=re.MULTILINE)
+    text = reg.sub(r'^(-{3,}|_{3,}|\*{3,})$', '', text, flags=re.MULTILINE)
     
     # Remove extra spaces
-    text = re.sub(r'\n{2,}', '\n', text)  # Normalize multiple newlines to one
+    text = reg.sub(r'\n{2,}', '\n', text)  # Normalize multiple newlines to one
     
     return text.strip()
 
