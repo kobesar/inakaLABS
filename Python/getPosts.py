@@ -120,7 +120,7 @@ def generate_post(title, snippet, model, config):
     return response
 
 # Grab all the sites from the query
-def get_sites(category, term, dateRestrict='d7'):
+def get_sites(category, term, dateRestrict='d1'):
   # Build exactTerms to search for
   exactTerms = ','.join(['japan', term])
 
