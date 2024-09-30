@@ -68,7 +68,7 @@ def remove_markdown(text):
     str: The text with markdown removed.
     """
     # Remove headers (e.g., ## Header, # Header)
-    text = reg.sub(r'^#{1,6}\s*', '', text, flags=re.MULTILINE)
+    text = reg.sub(r'^#{1,6}\s*', '', text, flags=reg.MULTILINE)
     
     # Remove emphasis (bold, italics, etc.)
     text = reg.sub(r'(\*{1,2}|_{1,2})(.*?)\1', r'\2', text)
@@ -81,19 +81,19 @@ def remove_markdown(text):
     text = reg.sub(r'(`{1,3})(.*?)\1', r'\2', text)
     
     # Remove blockquotes
-    text = reg.sub(r'^\>\s*', '', text, flags=re.MULTILINE)
+    text = reg.sub(r'^\>\s*', '', text, flags=reg.MULTILINE)
     
     # Remove strikethrough
     text = reg.sub(r'~~(.*?)~~', r'\1', text)
     
     # Remove unordered list bullets (*, +, -)
-    text = reg.sub(r'^(\*|\+|\-)\s+', '', text, flags=re.MULTILINE)
+    text = reg.sub(r'^(\*|\+|\-)\s+', '', text, flags=reg.MULTILINE)
     
     # Remove ordered list numbers (e.g., 1., 2., 3.)
-    text = reg.sub(r'^\d+\.\s+', '', text, flags=re.MULTILINE)
+    text = reg.sub(r'^\d+\.\s+', '', text, flags=reg.MULTILINE)
     
     # Remove horizontal rules (---, ***)
-    text = reg.sub(r'^(-{3,}|_{3,}|\*{3,})$', '', text, flags=re.MULTILINE)
+    text = reg.sub(r'^(-{3,}|_{3,}|\*{3,})$', '', text, flags=reg.MULTILINE)
     
     # Remove extra spaces
     text = reg.sub(r'\n{2,}', '\n', text)  # Normalize multiple newlines to one
