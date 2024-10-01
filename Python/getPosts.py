@@ -54,10 +54,10 @@ model_x = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_in
 
 # Generation Config
 config = GenerationConfig(
-    max_output_tokens=2048, temperature=0.2
+    max_output_tokens=2048, temperature=0.5
 )
 config_x = GenerationConfig(
-    max_output_tokens=60, temperature=0.2, top_k=50
+    max_output_tokens=60, temperature=0.5, top_k=50
 )
 
 def remove_markdown(text):
