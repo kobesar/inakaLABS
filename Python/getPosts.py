@@ -57,7 +57,7 @@ config = GenerationConfig(
     max_output_tokens=2048, temperature=0.5
 )
 config_x = GenerationConfig(
-    max_output_tokens=60, temperature=0.5, top_k=50
+    max_output_tokens=60, temperature=0.8, top_k=50
 )
 
 def remove_markdown(text):
