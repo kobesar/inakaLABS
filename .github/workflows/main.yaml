@@ -1,9 +1,9 @@
 name: Generate Posts
 
-on: workflow_dispatch
-# on:
-#   schedule:
-#     - cron: '0 0 * * *' # run once a day
+# on: workflow_dispatch
+on:
+  schedule:
+    - cron: '0 0 * * *' # run once a day
 
 permissions:
       contents: write
