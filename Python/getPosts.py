@@ -132,8 +132,10 @@ def get_sites(category, term, dateRestrict='d7'):
   # orTerms = category
   orTerms = ','.join([category])
 
+  sitesInclude = 'https://www.japantimes.co.jp, https://www.asahi.com, https://www.yomiuri.co.jp, https://mainichi.jp, https://asia.nikkei.com, https://www.tokyo-np.co.jp, https://www.hokkaido-np.co.jp, https://the-japan-news.com, https://english.kyodonews.net, https://www.jiji.com/en, https://www.nytimes.com, https://www.washingtonpost.com, https://www.wsj.com, https://www.latimes.com, https://www.usatoday.com, https://www.chicagotribune.com, https://www.theatlantic.com, https://www.bloomberg.com, https://www.reuters.com, https://www.npr.org'
+
   # Combine the base_url with the custom query
-  url = base_url + '&cx=%s&exactTerms=%s&orTerms=%s&dateRestrict=%s' % (cx, exactTerms, orTerms, dateRestrict)
+  url = base_url + '&cx=%s&exactTerms=%s&orTerms=%s&dateRestrict=%s&i=%s' % (cx, exactTerms, orTerms, dateRestrict, sitesInclude)
   
   result = []
 
