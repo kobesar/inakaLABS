@@ -125,10 +125,12 @@ def generate_post(title, snippet, model, config):
 # Grab all the sites from the query
 def get_sites(category, term, dateRestrict='d1'):
   # Build exactTerms to search for
-  exactTerms = ','.join(['japan', term])
+  # exactTerms = ','.join(['japan', term])
+  exactTerms = ','.join([term])
 
   # Other terms to search for
-  orTerms = category
+  # orTerms = category
+  orTerms = ','.join([category,'japan','yomiuri','asahi','nikkei','mainichi','japantimes','japantoday','mainichi','nhk','sankei','chunichi'])
 
   # Combine the base_url with the custom query
   url = base_url + '&cx=%s&exactTerms=%s&orTerms=%s&dateRestrict=%s' % (cx, exactTerms, orTerms, dateRestrict)
