@@ -14,9 +14,9 @@ from google.generativeai.types import HarmCategory, HarmBlockThreshold, Generati
 keywords_df = pd.read_csv('https://raw.githubusercontent.com/kobesar/inakaLABS/main/Data/Keywords.csv')
 
 # Load the environment variables
-GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+GOOGLE_API_KEY=os.getenv('GOOGLE_API_KEY')
 GEMINI_API_KEY=os.getenv('GEMINI_API_KEY')
-cx = os.getenv('SEARCH_TOOL_ID')
+cx=os.getenv('SEARCH_TOOL_ID')
 
 # Ccnfigure base URL for Search API
 base_url = 'https://www.googleapis.com/customsearch/v1?key=%s' % GOOGLE_API_KEY
@@ -122,30 +122,49 @@ def generate_post(title, snippet, model, config):
     
     return response
 
-# Grab all the sites from the query
-def get_sites(category, term, dateRestrict='d7'):
-  # Build exactTerms to search for
-  # exactTerms = ','.join(['japan', term])
-  exactTerms = ','.join([term,'japan'])
+# Function to get sites from Custom Search API
+def get_articles(category, term, dateRestrict='w1'):
+   # Build exactTerms to search for
+  exactTerms = ','.join(['japan', term])
 
   # Other terms to search for
-  # orTerms = category
-  orTerms = ','.join([category])
+  orTerms = category
 
-  sitesInclude = 'https://www.japantimes.co.jp,https://www.asahi.com,https://www.yomiuri.co.jp,https://mainichi.jp,https://asia.nikkei.com,https://www.tokyo-np.co.jp, https://www.hokkaido-np.co.jp,https://the-japan-news.com,https://english.kyodonews.net,https://www.jiji.com/en,https://www.nytimes.com,https://www.washingtonpost.com,https://www.wsj.com,https://www.latimes.com,https://www.usatoday.com,https://www.chicagotribune.com,https://www.theatlantic.com,https://www.bloomberg.com,https://www.reuters.com,https://www.npr.org'
+  # Sites to include
+  sitesInclude = [
+      'https://www.japantimes.co.jp', 
+      'https://www.asahi.com', 
+      'https://www.yomiuri.co.jp', 
+      'https://mainichi.jp', 
+      'https://asia.nikkei.com', 
+      'https://www.tokyo-np.co.jp', 
+      'https://www.hokkaido-np.co.jp', 
+      'https://www.nytimes.com', 
+      'https://www.wsj.com',
+      'https://www.bloomberg.com', 
+      'https://www.reuters.com', 
+      'https://www.npr.org'
+  ]
 
-  # Combine the base_url with the custom query
-  url = base_url + '&cx=%s&exactTerms=%s&orTerms=%s&dateRestrict=%s&siteSearch=%s&siteSearchFilter="i"' % (cx, exactTerms, orTerms, dateRestrict, sitesInclude)
-  
   result = []
 
-  response = re.get(url)
-  json = response.json()
+  for site in sitesInclude:
+    # Combine the base_url with the custom query
+    url = base_url + '&cx=%s&exactTerms=%s&orTerms=%s&dateRestrict=%s&siteSearch=%s&siteSearchFilter=i&sort=date-sdate:a' % (cx, exactTerms, orTerms, dateRestrict, site)
+  
+    response = re.get(url)
+    json = response.json()
 
-  # print(json)
+    if 'items' in json.keys():
+      result.append(json['items'])
 
-  if 'items' in json.keys():
-    for item in json['items']:
+  return result
+
+# Generates posts for a given term
+def generate_posts_for_term(articles):
+    result = []
+
+    for item in articles:
       post_general = generate_post(item['title'], item['snippet'], model_general, config)
       post_x = generate_post(item['title'], item['snippet'], model_x, config_x)
 
@@ -163,15 +182,15 @@ def get_sites(category, term, dateRestrict='d7'):
       })
       
     return result
-  else:
-    return []
   
 full_result = []
 
-for index, row in keywords_df.sample(50).iterrows():
+for index, row in keywords_df.sample(10).iterrows():
   category = row['Category Clean']
   term = row['Keyword Clean']
   
-  full_result += get_sites(category, term)
+  articles = get_articles(category, term)
+
+  full_result += generate_posts_for_term(articles)
 
 pd.DataFrame(full_result).to_csv('Data/Runs/query_results_' + time.strftime('%Y%m%d', time.localtime()) + '.csv', index=False)
